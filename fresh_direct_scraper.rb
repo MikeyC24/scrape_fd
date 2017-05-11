@@ -2,16 +2,6 @@ require 'mechanize'
 require 'sqlite3'
 require 'csv'
 
-mechanize = Mechanize.new
-
-database = File.new("fd.db", "a")
-database.close
-
-fd_db = SQLite3::Database.new("fd.db")
- 
-# adjust the page size param to change the number of pruducts pulled 
-page = mechanize.get('https://www.freshdirect.com/srch.jsp?pageType=search&searchParams=*&pageSize=30&all=false&activePage=1&sortBy=Sort_Name&orderAsc=true&activeTab=product&departmentFilterGroup=clearall')
-
 def pull_text(css_path_string, mechanize_page)
 	if mechanize_page.at(css_path_string) != nil
 		return mechanize_page.at(css_path_string).text.strip
@@ -46,8 +36,20 @@ def execute_sql_to_csv(sql_string,name_of_primary_table_queried, database)
 	end
 end
 
+mechanize = Mechanize.new
 
-headers = ["product_name", "serving_size", "servings", "total_fat", "cholesterol", "sodium", "total_carb", "dietary_fiber", "sugars", "url"]
+database = File.new("fd.db", "a")
+database.close
+
+fd_db = SQLite3::Database.new("fd.db")
+ 
+# adjust the page size param to change the number of pruducts pulled 
+page = mechanize.get('https://www.freshdirect.com/srch.jsp?pageType=search&searchParams=*&pageSize=30&all=false&activePage=1&sortBy=Sort_Name&orderAsc=true&activeTab=product&departmentFilterGroup=clearall')
+
+
+
+
+headers = ["product_name", "serving_size", "servings", "total_fat", "cholesterol", "sodium", "total_carb", "dietary_fiber", "sugars", "url", "price", "price_deal", "protein", "catagory"]
 
 table_header = "id INTEGER PRIMARY KEY,"
 table_header_for_insert = ""
@@ -151,6 +153,35 @@ links.flatten.each do |link|
 	url = product_page.uri.to_s
 	values << url
 
+	price = pull_text('.pdp-price', product_page)
+	price = not_nil(price)
+	price = price.gsub(/\s+/, ' ')
+	price.delete!("\n")
+	price.gsub!(/"|'/, ' ')
+	values << price
+
+	price_deal = pull_text('.price-deal', product_page)
+	price_deal = not_nil(price_deal)
+	price_deal = price_deal.gsub(/\s+/, ' ')
+	price_deal.delete!("\n")
+	price_deal.gsub!(/"|'/, ' ')
+	values << price_deal
+
+	protein = pull_text('td:contains("Protein"), .text9', product_page)
+	protein = not_nil(protein)
+	protein = protein.gsub(/\s+/, ' ')
+	protein.delete!("\n")
+	protein.gsub!(/"|'/, ' ')
+	values << protein
+
+
+	catagory = pull_text('a[data-component="breadcrumb"]', product_page)
+	catagory = not_nil(catagory)
+	catagory = catagory.gsub(/\s+/, ' ')
+	catagory.delete!("\n")
+	catagory.gsub!(/"|'/, ' ')
+	values << catagory
+
 	value_for_insert = ""
 	counter = 0
 	values.each do |value|
@@ -173,11 +204,19 @@ add_row_cmd = <<-row_to_add
 	fd_db.execute(add_row_cmd)	
 end
 
-# # export products to csv for fun
-# table_to_query = "products"
+# export to CSV?
 
-# sqlcommand = <<-sql
-# SELECT * FROM #{table_to_query}
-# sql
+p "Enter y to export to csv"
 
-# execute_sql_to_csv(sqlcommand, table_to_query, fd_db)
+input = gets.chomp
+
+if input == "y"
+
+	table_to_query = "products"
+
+	sqlcommand = <<-sql
+	SELECT * FROM #{table_to_query}
+	sql
+
+	execute_sql_to_csv(sqlcommand, table_to_query, fd_db)
+end
