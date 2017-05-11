@@ -21,6 +21,8 @@ end
 def not_nil(string)
 	if string == nil
 		return "nil"
+	elsif string.length > 250
+		return "nil"
 	else
 		return string
 	end
@@ -99,47 +101,47 @@ links.flatten.each do |link|
 	product_name.gsub!(/"|'/, ' ')
 	values << product_name
 
-	serving_size = pull_text('td:contains("Serv. Size")', product_page)
+	serving_size = pull_text('td:contains("Serv. Size"), .text9', product_page)
 	serving_size = not_nil( serving_size)
 	serving_size.gsub!(/"|'/, ' ')
 	values << serving_size
 
-	servings = pull_text('td:contains("Calories")', product_page)
+	servings = pull_text('td:contains("Calories"), .text9', product_page)
 	servings = not_nil( servings)
 	servings.gsub!(/"|'/, ' ')
 	values << servings
 
-	total_fat = pull_text('td:contains("Total Fat")', product_page)
+	total_fat = pull_text('td:contains("Total Fat"), .text9', product_page)
 	total_fat = not_nil(total_fat)
 	total_fat.gsub!(/"|'/, ' ')
 	values << total_fat
 
-	cholesterol = pull_text('td:contains("Cholesterol")', product_page)
+	cholesterol = pull_text('td:contains("Cholesterol"), .text9', product_page)
 	cholesterol = not_nil( cholesterol)
 	cholesterol.gsub!(/"|'/, ' ')
 	values << cholesterol
 
-	sodium = pull_text('td:contains("Sodium")', product_page)
+	sodium = pull_text('td:contains("Sodium"), .text9', product_page)
 	sodium = not_nil(sodium)
 	sodium.gsub!(/"|'/, ' ')
 	values << sodium
 
 
-	total_carb = pull_text('td:contains("Total Carbohydrate")', product_page)
+	total_carb = pull_text('td:contains("Total Carbohydrate"), .text9', product_page)
 	total_carb = not_nil(total_carb)
 	total_carb = total_carb.gsub(/\s+/, ' ')
 	total_carb.delete!("\n")
 	total_carb.gsub!(/"|'/, ' ')
 	values << total_carb
 
-	dietary_fiber = pull_text('td:contains("Dietary Fiber")', product_page)
+	dietary_fiber = pull_text('td:contains("Dietary Fiber"), .text9', product_page)
 	dietary_fiber = not_nil( dietary_fiber)
 	dietary_fiber = dietary_fiber.gsub(/\s+/, ' ')
 	dietary_fiber.delete!("\n")
 	dietary_fiber.gsub!(/\s|"|'/, '')
 	values << dietary_fiber
 
-	sugars = pull_text('td:contains("Sugars")', product_page)
+	sugars = pull_text('td:contains("Sugars"), .text9', product_page)
 	sugars = not_nil( sugars)
 	sugars = sugars.gsub(/\s+/, ' ')
 	sugars.delete!("\n")
