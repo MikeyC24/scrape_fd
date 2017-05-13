@@ -15,8 +15,24 @@ text = %q("product_name"=>"100% Grass-Fed Local 85% Lean Ground Beef, Frozen", "
 "100% Grass-Fed Local 85% Lean Ground Beef, Frozen"
 "100% Grass-Fed Local 85% Lean Ground Beef, Frozen")
 
-puts text.is_a?(String)
-puts text.is_a?(Integer)
+text1 = %q({"product_name"=>"100% Grass-Fed Local Beef Eye Round Steak", "price"=>"$9.99/lb", "price_deal"=>"nil", 0=>"100% Grass-Fed Local Beef Eye Round Steak", 1=>"$9.99/lb", 2=>"nil"}
+"100% Grass-Fed Local Beef Eye Round Steak"
+"100% Grass-Fed Local Beef Eye Round Steak")
+
+def pricing_both(string_for_product)
+	if string_for_product.include?(%q("price_deal"=>"nil"))
+		return pricing_vars(string_for_product)
+	else
+		p "no"
+	end
+end
+
+
+
+
+#puts text.is_a?(String)
+#puts text.is_a?(Integer)
+
 #text_split1 = text.split("\"")
 #print text_split1
 #price = text.scan(/\$[\d,]+.[\d,]+/)[0]
@@ -24,23 +40,23 @@ puts text.is_a?(Integer)
 #puts price
 puts " "
 def pricing_vars(string_for_product)
-	puts string_for_product.class
+	#puts string_for_product.class
 	text_split2 = String(string_for_product.split("\""))
-	puts text_split2.class
+	#puts text_split2.class
 	price = text_split2.scan(/\$[\d,]+.[\d,]+/)[0]
 	return price
 end
 
 def unit_vars(string_for_product)
-	puts string_for_product.class
+	#puts string_for_product.class
 	text_split2 = String(string_for_product.split("\""))
-	puts text_split2.class
+	#puts text_split2.class
 	#price = text_split2.scan(/\$[\d,]+.[\d,]+/)[0]
 	#puts price.class
 	text_split3 = String(text_split2.split(/\d+/))
-	puts text_split3.class
+	#puts text_split3.class
 	unit_test = text_split3.scan(/\/\w+/)[0]
-	puts unit_test.class
+	#puts unit_test.class
 	if unit_test == "/ea"
 		unit = "each"
 		#return unit
@@ -55,11 +71,16 @@ end
 
 
 
+price_text = pricing_both(text)
+price_text1 = pricing_both(text1)
+#price = pricing_vars(text)
+unit_text = unit_vars(text)
+unit_text1 = unit_vars(text1)	
+puts price_text
+puts price_text1
+puts unit_text
+puts unit_text1
 
-price = pricing_vars(text)
-unit = unit_vars(text)	
-puts price
-puts unit
 
 =begin
 price = text.scan(/\$[\d,]+.[\d,]+/)[0]
